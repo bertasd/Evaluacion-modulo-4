@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Evaluación módulo 4</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+
+    <body>
+
+    <div class="container mt-3">
+        <h1>Evaluación módulo 4</h1>
+        <button class="btn btn-primary mb-3" onclick="datos.nombreUsuarios()">
+            Nombre usuarios
+        </button>
+        <br>
+        
+        <!--<button class="btn btn-primary mb-3" onclick="datos.usuarioParticular()">
+            Datos usuario particular
+        </button>-->
+
+        <button class="btn btn-primary mb-3" onclick="datos.buscarUsuarioPorNombre()">
+            Datos de usuario por Nombre (username y correo) 
+        </button>
+        <br>
+
+        <button class="btn btn-primary mb-3" onclick="datos.buscarDireccionPorNombre()">
+            Datos de usuario por Nombre (dirección) 
+        </button>
+        <br>
+
+        <button class="btn btn-primary mb-3" onclick="datos.buscarOtrosDatosPorNombre()">
+            Datos de usuario por Nombre (teléfono, sitio web y compañía) 
+        </button>
+        <br>
+
+
+
+        <button class="btn btn-primary mb-3" onclick="datos.nombreCompañias()">
+            Nombre compañias
+        </button>
+        <br>
+        <button class="btn btn-primary mb-3" onclick="datos.nombreUsuariosOrdenado()">
+            Nombre usuarios ordenado alfabeticamente
+        </button>
+        <div id="contenedor"></div>
+    </div>
+
+    <script>
+
+        // 1. Definimos la Clase con Mayúscula (PascalCase)
+        class Datos {
+            
+            nombreUsuarios() {
+                const servicio = new XMLHttpRequest();
+                const contenedor = document.getElementById("contenedor");
+
+                // Limpiamos el contenedor antes de realizar la nueva carga
+                contenedor.innerHTML = "";
+
+                // Configuramos la petición GET a la API
+                servicio.open('GET', 'https://jsonplaceholder.typicode.com/users', true);
+
+                // Definimos qué hacer cuando se reciban los datos
+                servicio.onload = function() {
+                    if (servicio.status === 200) {
+                        const data = JSON.parse(servicio.response);
+                        
+                        data.forEach(usuario => {
+                            contenedor.innerHTML += `
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            ${usuario.name}
+                                        </h5>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        console.error("Error al cargar los datos de la API");
+                    }
+                };
+
+                // Enviamos la petición activamente
+                servicio.send();                
+            }
+
+            /*usuarioParticular() {
+                const servicio = new XMLHttpRequest();
+                const contenedor = document.getElementById("contenedor");
+
+                // Limpiamos el contenedor antes de realizar la nueva carga
+                contenedor.innerHTML = "";
+
+                // Configuramos la petición GET a la API
+                servicio.open('GET', 'https://jsonplaceholder.typicode.com/users', true);
+
+                // Definimos qué hacer cuando se reciban los datos
+                servicio.onload = function() {
+                    if (servicio.status === 200) {
+                        const data = JSON.parse(servicio.response);
+                       
+                        // Accedemos al tercer objeto del arreglo (índice 2)
+                        const tercerUsuario = data[2];
+                        
+                        if (tercerUsuario) {
+                            // Extraemos las propiedades que nos interesan: username y email
+                            const nombreUsuario = tercerUsuario.username;
+                            const correo = tercerUsuario.email;
+
+                            // 1. Lo mostramos por consola (F12)
+                            prompt("Ver datos del tercer usuario");
+                            console.log("Datos del Tercer Usuario:");
+                            console.log(`Nombre de usuario (username): ${nombreUsuario}`);
+                            console.log(`Correo electrónico (email): ${correo}`);
+                            console.log("-------------------------------------------------")};
+
+                    } else {
+                        console.error("Error de conexión al buscar el usuario particular");
+                    }
+                };
+
+                // Enviamos la petición activamente
+                servicio.send();                
+            }*/
+
+            // === NUEVO MÉTODO: Pedir nombre por prompt y filtrar datos en consola ===
+            buscarUsuarioPorNombre() {
+                // 1. Capturamos el nombre ingresado por el usuario
+                let nombreBuscado = prompt("Ingrese el nombre completo del usuario a consultar:");
+
+                // Verificación de seguridad: si el usuario canceló el prompt o lo dejó vacío
+                if (nombreBuscado === null || nombreBuscado.trim() === "") {
+                    console.log("Búsqueda cancelada o vacía.");
+                    return;
+                }
+
+                const servicio = new XMLHttpRequest();
+                servicio.open('GET', 'https://jsonplaceholder.typicode.com/users', true);
+                
+                servicio.onload = function() {
+                    if (servicio.status === 200) {
+                        const data = JSON.parse(servicio.response); // Arreglo de usuarios
+
+                        // 2. Buscamos al usuario en el arreglo usando .find()
+                        // Convertimos ambos textos a minúsculas (.toLowerCase()) para evitar problemas con mayúsculas
+                        const usuarioEncontrado = data.find(usuario => {
+                            return usuario.name.toLowerCase().includes(nombreBuscado.toLowerCase());
+                        });
+
+                        // 3. Evaluamos si el usuario realmente existía en la API
+                        if (usuarioEncontrado) {
+                            console.log("¡Usuario encontrado con éxito!");
+                            console.log(`Nombre: ${usuarioEncontrado.name}`);
+                            console.log(`Username: ${usuarioEncontrado.username}`);
+                            console.log(`Email: ${usuarioEncontrado.email}`);
+                            console.log("-------------------------------------------------");
+                        } else {
+                            console.log(`No se encontró ningún usuario que coincida con: "${nombreBuscado}"`);
+                        }
+                    } else {
+                        console.error("Error al conectar con la API");
+                    }
+                };
+
+                servicio.send();
+            }
+            
+            // Pedir nombre por prompt y filtrar datos en consola
+            buscarDireccionPorNombre() {
+                // 1. Capturamos el nombre ingresado por el usuario
+                let buscado = prompt("Ingrese el nombre completo del usuario a consultar:");
+
+                // Verificación de seguridad: si el usuario canceló el prompt o lo dejó vacío
+                if (buscado === null || buscado.trim() === "") {
+                    console.log("Búsqueda cancelada o vacía.");
+                    return;
+                }
+
+                const servicio = new XMLHttpRequest();
+                servicio.open('GET', 'https://jsonplaceholder.typicode.com/users', true);
+                
+                servicio.onload = function() {
+                    if (servicio.status === 200) {
+                        const data = JSON.parse(servicio.response); // Arreglo de usuarios
+
+                        // 2. Buscamos al usuario en el arreglo usando .find()
+                        // Convertimos ambos textos a minúsculas (.toLowerCase()) para evitar problemas con mayúsculas
+                        const encontrado = data.find(usuario => {
+                            return usuario.name.toLowerCase().includes(buscado.toLowerCase());
+                        });
+
+                        // 3. Evaluamos si el usuario realmente existía en la API
+                        if (encontrado) {
+                            console.log("¡Usuario encontrado con éxito!");
+                            console.log(`Nombre: ${encontrado.name}`);
+                            console.log(`Dirección:`);
+                            console.log(`  Calle: ${encontrado.address.street}`);
+                            console.log(`  Suite: ${encontrado.address.suite}`);
+                            console.log(`  Ciudad: ${encontrado.address.city}`);
+                            console.log(`  Zipcode: ${encontrado.address.zipcode}`);
+                            console.log(`  Geo:`);
+                            console.log(`    lat: ${encontrado.address.geo.lat}`);
+                            console.log(`    lng: ${encontrado.address.geo.lng} `);
+                            console.log("-------------------------------------------------");
+                        } else {
+                            console.log(`No se encontró ningún usuario que coincida con: "${buscado}"`);
+                        }
+                    } else {
+                        console.error("Error al conectar con la API");
+                    }
+                };
+
+                servicio.send();
+            }            
+
+            
+            // Pedir nombre por prompt y filtrar datos en consola
+            buscarOtrosDatosPorNombre() {
+                // 1. Capturamos el nombre ingresado por el usuario
+                let buscado = prompt("Ingrese el nombre completo del usuario a consultar:");
+
+                // Verificación de seguridad: si el usuario canceló el prompt o lo dejó vacío
+                if (buscado === null || buscado.trim() === "") {
+                    console.log("Búsqueda cancelada o vacía.");
+                    return;
+                }
+
+                const servicio = new XMLHttpRequest();
+                servicio.open('GET', 'https://jsonplaceholder.typicode.com/users', true);
+                
+                servicio.onload = function() {
+                    if (servicio.status === 200) {
+                        const data = JSON.parse(servicio.response); // Arreglo de usuarios
+
+                        // 2. Buscamos al usuario en el arreglo usando .find()
+                        // Convertimos ambos textos a minúsculas (.toLowerCase()) para evitar problemas con mayúsculas
+                        const encontrado = data.find(usuario => {
+                            return usuario.name.toLowerCase().includes(buscado.toLowerCase());
+                        });
+
+                        // 3. Evaluamos si el usuario realmente existía en la API
+                        if (encontrado) {
+                            console.log("¡Usuario encontrado con éxito!");
+                            console.log(`Nombre: ${encontrado.name}`);
+                            console.log(`Otros datos`);
+                            console.log(`Teléfono: ${encontrado.phone}`);
+                            console.log(`Sitio web: ${encontrado.website}`);
+                            console.log(`Compañia:`);
+                            console.log(`  Nombre: ${encontrado.company.name}`);
+                            console.log(`  catchPhrase: ${encontrado.company.catchPhrase}`);
+                            console.log(`  bs: ${encontrado.company.bs}`);
+                            console.log("-------------------------------------------------");
+                        } else {
+                            console.log(`No se encontró ningún usuario que coincida con: "${buscado}"`);
+                        }
+                    } else {
+                        console.error("Error al conectar con la API");
+                    }
+                };
+
+                servicio.send();
+            }
+
+
+
+
+
+
+
+
+            nombreCompañias() {
+                const servicio = new XMLHttpRequest();
+                const contenedor = document.getElementById("contenedor");
+
+                // Limpiamos el contenedor antes de realizar la nueva carga
+                contenedor.innerHTML = "";
+
+                // Configuramos la petición GET a la API
+                servicio.open('GET', 'https://jsonplaceholder.typicode.com/users', true);
+
+                // Definimos qué hacer cuando se reciban los datos
+                servicio.onload = function() {
+                    if (servicio.status === 200) {
+                        const data = JSON.parse(servicio.response);
+                        
+                        data.forEach(usuario => {
+                            contenedor.innerHTML += `
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            Nombre company: ${usuario.company.name} <br> Frase clave: ${usuario.company.catchPhrase}
+                                        </h5>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        console.error("Error al cargar los datos de la API");
+                    }
+                };
+
+                // Enviamos la petición activamente
+                servicio.send();                
+            }
+
+                nombreUsuariosOrdenado() {
+                const servicio = new XMLHttpRequest();
+                const contenedor = document.getElementById("contenedor");
+
+                // Limpiamos el contenedor antes de realizar la nueva carga
+                contenedor.innerHTML = "";
+
+                // Configuramos la petición GET a la API
+                servicio.open('GET', 'https://jsonplaceholder.typicode.com/users', true);
+
+                // Definimos qué hacer cuando se reciban los datos
+                servicio.onload = function() {
+                    if (servicio.status === 200) {
+                        const data = JSON.parse(servicio.response);
+
+                // 1. Extraemos SOLO los nombres en un nuevo array: ["Leanne", "Ervin", ...]
+                const soloNombres = data.map(usuario => usuario.name);
+
+                // 2. Ordenamos el array de texto puro (el comportamiento por defecto es de la A a la Z)
+                soloNombres.sort();
+
+                // 3. Renderizamos directamente los nombres del nuevo array
+                soloNombres.forEach(nombre => {
+                    contenedor.innerHTML += `
+                        <div class="card mb-3">
+                            <div class="card-body"><h5 class="card-title">${nombre}</h5></div>
+                        </div>`;
+                })
+            }
+        };
+                // Enviamos la petición activamente
+                servicio.send();                
+            }
+        }
+        //Instanciamos la clase usando una constante en minúscula
+        const datos = new Datos();
+    </script>
+</body>
+</html>
