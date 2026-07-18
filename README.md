@@ -1,5 +1,6 @@
 Evaluación módulo 4:
-
+Autor: Berta Sazo Díaz
+URL: https://github.com/bertasd/Evaluacion-modulo-4
 Se manipulan datos disponibles en API: https://jsonplaceholder.typicode.com/users y se presentan en pantalla y en consola.
 
 "El constructor debe pedir la data mediante XMLHttpRequest y almacenarla dentro de la clase para su posterior uso.
